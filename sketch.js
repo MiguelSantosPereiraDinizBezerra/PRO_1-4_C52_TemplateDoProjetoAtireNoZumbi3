@@ -7,11 +7,13 @@ var heart1Img, heart2Img, heart3Img;
 
 var zombieGroup;
 
-var bullets = 70;
+var bullets = 2;
 var life = 3;
 
 var gameState = "fight"
 
+var bulletImg
+var lose
 
 function preload(){
   
@@ -26,6 +28,8 @@ function preload(){
 
   bgImg = loadImage("assets/bg.jpeg")
 
+  bulletImg = loadImage("pngegg.png")
+  lose = loadSound("assets/lose.mp3")
 }
 
 function setup() {
@@ -116,7 +120,8 @@ if(keyDown("DOWN_ARROW")||touches.length>0){
 if(keyWentDown("space")){
   bullet = createSprite(displayWidth-1150,player.y-30,20,10)
   bullet.velocityX = 20
-  
+  bullet.addImage(bulletImg)
+  bullet.scale = 0.08
   bulletGroup.add(bullet)
   player.depth = bullet.depth
   player.depth = player.depth+2
@@ -132,17 +137,18 @@ else if(keyWentUp("space")){
 //vá para gameState (estado do jogo) "bala" quando o jogador ficar sem balas
 if(bullets==0){
   gameState = "bullet"
-    
+    lose.play()
+    lose.setVolume(0.2)
 }
 
 //destruir o zumbi quando a bala tocar nele
 if(zombieGroup.isTouching(bulletGroup)){
   for(var i=0;i<zombieGroup.length;i++){     
       //escreva uma condição para quando o zombiegroup (grupo de zumbi) tocar bulletGroup (grupo de bala)
-   if(){
+   if(zombieGroup[i].isTouching(bulletGroup)){
 //destruir o zumbi
         bulletGroup.destroyEach()
-       
+        zombieGroup[i].destroy()
         } 
   
   }
@@ -156,6 +162,7 @@ if(zombieGroup.isTouching(player)){
   if(zombieGroup[i].isTouching(player)){
        zombieGroup[i].destroy()
 //Diminua a vida
+        life -= 1
        } 
  
  }
@@ -170,13 +177,15 @@ drawSprites();
 //destrua o zumbi e o jogador e exiba uma mensagem no gameState "lost" (perdeu)
 if(gameState == "lost"){
   
-  textSize(100)
+  textSize(50)
   fill("red")
 
   //use texto para mostrar que você perdeu
+  text("seu cerebro foi comido era melhor ter usado uma planta",100,height/2);
   //destrua o grupo de zumbis
+  zombieGroup.destroyEach()
   //destrua o jogador
- 
+  player.destroy()
 
 }
 
